@@ -7,7 +7,6 @@
     <meta property="og:title" content="Cotizador Mayorista - Precios Oficiales">
     <meta property="og:description" content="Consulta precios del Mercado Mayorista (MIDAGRI). ¡No pagues de más!">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Cotizador Express">
 
     <title>Cotizador Mayorista - Precios al Día</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -25,94 +24,159 @@
     <style>
         .touch-action-manipulation { touch-action: manipulation; }
         .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
-        .fade-in { animation: fadeIn 0.2s ease-out; }
-        .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 10px 10px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 15px 15px; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-open { overflow: hidden; }
     </style>
 </head>
 <body class="bg-pattern text-slate-800 font-sans antialiased min-h-screen pb-40">
 
     <!-- Encabezado -->
-    <header class="bg-blue-700 text-white p-4 shadow-lg sticky top-0 z-50">
+    <header class="bg-blue-700 text-white p-4 shadow-xl sticky top-0 z-50">
         <div class="flex justify-between items-center max-w-lg mx-auto">
             <div>
-                <h1 class="text-xl font-black flex items-center tracking-tight">
-                    <i class="fas fa-shopping-basket mr-2"></i> PRECIOS AL DÍA
+                <h1 class="text-xl font-black flex items-center tracking-tighter">
+                    <i class="fas fa-chart-line mr-2"></i> MONITOR DE PRECIOS
                 </h1>
-                <p id="fechaReporte" class="text-[10px] text-blue-200 uppercase font-bold tracking-widest mt-1">Cargando...</p>
+                <p id="fechaReporte" class="text-[10px] text-blue-200 uppercase font-black tracking-widest mt-0.5">Sincronizando...</p>
             </div>
-            <div id="statusBadge" class="text-[10px] font-bold bg-blue-600 px-2 py-1 rounded-full border border-blue-400/30">
-                CONECTANDO...
+            <div id="statusBadge" class="text-[9px] font-black bg-blue-800 px-2 py-1 rounded-full border border-blue-400/30 uppercase">
+                ...
             </div>
         </div>
     </header>
 
     <main class="max-w-lg mx-auto p-4">
 
-        <!-- Aviso de seguridad -->
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 mb-6 rounded shadow-sm flex items-start fade-in">
-            <i class="fas fa-shield-alt text-amber-500 mt-0.5 mr-3"></i>
-            <p class="text-xs text-amber-900 leading-snug">
-                <strong>Dato de Casera:</strong> Estos son precios de referencia (por mayor). Úsalos para que no te cobren de más en tu mercado local.
-            </p>
-        </div>
-
-        <!-- Buscador -->
-        <div class="bg-white rounded-2xl shadow-xl p-5 mb-6 border border-slate-200">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">¿Qué vas a comprar hoy?</label>
-            <div class="relative group">
-                <i class="fas fa-search absolute left-4 top-4 text-slate-300 group-focus-within:text-blue-500 transition-colors"></i>
-                <input type="text" id="searchInput" 
-                    placeholder="Busca papa, limón, cebolla..." 
-                    inputmode="search"
-                    enterkeyhint="search"
-                    class="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-medium"
-                    autocomplete="off" 
-                    autocorrect="off"
-                    spellcheck="false"
-                    disabled>
-                
-                <div id="suggestions" class="absolute w-full bg-white shadow-2xl rounded-xl border border-slate-200 hidden max-h-[350px] overflow-y-auto z-50 mt-2"></div>
-            </div>
-
-            <!-- Accesos Rápidos -->
-            <div class="flex flex-wrap gap-2 mt-4">
-                <button onclick="quickSearch('Papa')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 rounded-full text-xs font-bold transition-colors">🥔 Papas</button>
-                <button onclick="quickSearch('Limon')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 rounded-full text-xs font-bold transition-colors">🍋 Limón</button>
-                <button onclick="quickSearch('Cebolla')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 rounded-full text-xs font-bold transition-colors">🧅 Cebolla</button>
-                <button onclick="quickSearch('Tomate')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 rounded-full text-xs font-bold transition-colors">🍅 Tomate</button>
+        <!-- Banner Oficial -->
+        <div class="bg-white border-b-4 border-blue-500 p-4 mb-6 rounded-xl shadow-md fade-in">
+            <div class="flex items-start">
+                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                    <i class="fas fa-balance-scale text-blue-600"></i>
+                </div>
+                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                    <strong class="text-blue-700 block mb-0.5 uppercase tracking-tighter text-xs">Aviso Importante:</strong>
+                    Precios Referenciales: Basados en reporte oficial MIDAGRI (Kg por mayor). El precio final puede variar según calidad y puesto.
+                </p>
             </div>
         </div>
 
-        <!-- Lista de Cotización -->
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest">Tu Lista de Ahorro</h2>
-            <button onclick="clearCart()" class="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-tighter">
-                <i class="fas fa-trash-alt mr-1"></i> Vaciar
+        <!-- Dashboard de Análisis (Botones Superiores) -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <button onclick="openPriceModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+                <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-tags text-indigo-500"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1">Precios</span>
+                <span class="text-[11px] font-bold text-slate-700 leading-none">Los + Caros y Baratos</span>
+            </button>
+            <button onclick="openVarModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+                <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-percentage text-emerald-500"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1">Variación</span>
+                <span class="text-[11px] font-bold text-slate-700 leading-none">Los que + Cambiaron</span>
             </button>
         </div>
 
+        <!-- Buscador -->
+        <div class="bg-white rounded-2xl shadow-xl p-5 mb-6 border border-slate-200 relative">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Buscador de Productos</label>
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-4 text-slate-300"></i>
+                <input type="text" id="searchInput" 
+                    placeholder="Escribe: Papa, Limón, Cebolla..." 
+                    inputmode="search"
+                    class="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold"
+                    autocomplete="off" disabled>
+                
+                <div id="suggestions" class="absolute w-full bg-white shadow-2xl rounded-xl border border-slate-200 hidden max-h-[350px] overflow-y-auto z-50 mt-2"></div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+                <button onclick="quickSearch('Papa')" class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-tighter">🥔 Papas</button>
+                <button onclick="quickSearch('Limon')" class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-tighter">🍋 Limón</button>
+                <button onclick="quickSearch('Cebolla')" class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-tighter">🧅 Cebolla</button>
+                <button onclick="quickSearch('Tomate')" class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-tighter">🍅 Tomate</button>
+            </div>
+        </div>
+
+        <!-- Lista -->
+        <div class="flex justify-between items-center mb-4 px-1">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest">Mi Lista de Ahorro</h2>
+            <button onclick="clearCart()" class="text-[10px] font-black text-red-400 uppercase tracking-tighter bg-red-50 px-3 py-1 rounded-full">Vaciar</button>
+        </div>
+
         <div id="quoteList" class="space-y-3 mb-32">
-            <div id="emptyState" class="bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-shopping-cart text-slate-300 text-2xl" id="loadingIcon"></i>
-                </div>
-                <p id="emptyMsg" class="text-slate-400 font-medium text-sm">Busca productos arriba para agregarlos a tu lista.</p>
+            <div id="emptyState" class="bg-white/40 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
+                <i class="fas fa-shopping-basket text-slate-200 text-4xl mb-3"></i>
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Tu lista está vacía</p>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer de Total -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] p-5 z-50">
+    <!-- Footer Total -->
+    <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] p-5 z-50">
         <div class="max-w-lg mx-auto flex justify-between items-center">
             <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Estimado</p>
-                <p id="totalPrice" class="text-3xl font-black text-blue-800 tracking-tighter">S/ 0.00</p>
+                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Suma Total</p>
+                <p id="totalPrice" class="text-3xl font-black text-blue-900 tracking-tighter">S/ 0.00</p>
             </div>
-            <button onclick="shareQuote()" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-green-200 flex items-center transition-all active:scale-95">
+            <button onclick="shareQuote()" class="bg-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg flex items-center transition-all active:scale-95">
                 <i class="fab fa-whatsapp mr-2 text-xl"></i> PEDIR
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL PRECIOS (CAROS/BARATOS) -->
+    <div id="priceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black text-slate-800 uppercase italic">Los Extremos del Día</h3>
+                <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h4 class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3 flex items-center">
+                        <i class="fas fa-arrow-circle-up mr-2"></i> Top 5: Los más caros
+                    </h4>
+                    <div id="topExpensive" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3 flex items-center">
+                        <i class="fas fa-arrow-circle-down mr-2"></i> Top 5: Los más económicos
+                    </h4>
+                    <div id="topCheap" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VARIACION (SUBIERON/BAJARON) -->
+    <div id="varModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black text-slate-800 uppercase italic">Pulso de Variación %</h3>
+                <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3 flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i> Top 5: Los que más subieron
+                    </h4>
+                    <div id="topUp" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3 flex items-center">
+                        <i class="fas fa-chart-line fa-flip-vertical mr-2"></i> Top 5: Los que más bajaron
+                    </h4>
+                    <div id="topDown" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -120,13 +184,11 @@
         const CSV_URL = 'data/precios_mercado.csv'; 
         let database = [];
         let cart = [];
-        let colPrecioHoy = -1;
-        let colVarHoy = -1;
+        let colHoy = -1, colAyer = -1, colVar = -1;
 
         const searchInput = document.getElementById('searchInput');
         const suggestionsBox = document.getElementById('suggestions');
         const quoteList = document.getElementById('quoteList');
-        const emptyState = document.getElementById('emptyState');
         const totalPriceEl = document.getElementById('totalPrice');
         const statusBadge = document.getElementById('statusBadge');
         const fechaReporte = document.getElementById('fechaReporte');
@@ -136,14 +198,12 @@
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 procesarCSV(csvText);
-                
-                statusBadge.innerText = "SISTEMA ACTIVO";
-                statusBadge.className = "text-[10px] font-bold bg-green-500 px-2 py-1 rounded-full text-white fade-in";
+                statusBadge.innerText = "ONLINE";
+                statusBadge.className = "text-[9px] font-black bg-emerald-500 px-2 py-1 rounded-full text-white";
                 searchInput.disabled = false;
-            } catch (error) {
-                statusBadge.innerText = "ERROR DE CARGA";
-                statusBadge.className = "text-[10px] font-bold bg-red-500 px-2 py-1 rounded-full text-white";
-                document.getElementById('emptyMsg').innerText = "No se pudo conectar con los precios de hoy.";
+            } catch (e) {
+                statusBadge.innerText = "ERROR";
+                statusBadge.className = "text-[9px] font-black bg-red-500 px-2 py-1 rounded-full text-white";
             }
         });
 
@@ -151,27 +211,90 @@
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
             
-            // Columna de hoy (penúltima) y Variación Hoy/Ayer (última)
-            colPrecioHoy = headers.length - 2;
-            colVarHoy = headers.length - 1;
-            fechaReporte.innerText = `Referencia: ${headers[colPrecioHoy]}`;
+            // Indices
+            colHoy = headers.length - 2;
+            colAyer = headers.length - 3;
+            colVar = headers.length - 1;
+            fechaReporte.innerText = `Precios de Hoy: ${headers[colHoy]}`;
 
             for (let i = 1; i < lines.length; i++) {
                 const row = lines[i].split(',');
                 if (row.length < headers.length) continue;
 
-                const precio = parseFloat(row[colPrecioHoy]);
-                if (!isNaN(precio)) {
+                const pHoy = parseFloat(row[colHoy]);
+                const pAyer = parseFloat(row[colAyer]);
+                const vStr = row[colVar] ? row[colVar].replace(/"/g, '') : "0.0%";
+                const vFloat = parseFloat(vStr.replace('%','')) || 0;
+
+                if (!isNaN(pHoy) && row[1]) {
                     database.push({
-                        name: row[1].replace(/"/g, ''),
-                        market: row[2].replace(/"/g, ''),
-                        price: precio,
-                        variation: row[colVarHoy] ? row[colVarHoy].replace(/"/g, '') : "0%"
+                        name: row[1].replace(/"/g, '').trim(),
+                        market: row[2].replace(/"/g, '').trim(),
+                        priceToday: pHoy,
+                        priceYesterday: pAyer,
+                        varStr: vStr,
+                        varFloat: vFloat
                     });
                 }
             }
         }
 
+        // --- Lógica de Modales ---
+        function openPriceModal() {
+            document.body.classList.add('modal-open');
+            document.getElementById('priceModal').style.display = 'flex';
+            
+            // Ordenar por precio hoy descendente
+            const sorted = [...database].sort((a,b) => b.priceToday - a.priceToday);
+            renderTable('topExpensive', sorted.slice(0, 5), true);
+            renderTable('topCheap', sorted.slice(-5).reverse(), true);
+        }
+
+        function openVarModal() {
+            document.body.classList.add('modal-open');
+            document.getElementById('varModal').style.display = 'flex';
+            
+            // Ordenar por variación % descendente
+            const sorted = [...database].sort((a,b) => b.varFloat - a.varFloat);
+            renderTable('topUp', sorted.slice(0, 5), false);
+            renderTable('topDown', sorted.slice(-5).reverse(), false);
+        }
+
+        function renderTable(containerId, list, isPrice) {
+            const container = document.getElementById(containerId);
+            let html = `<table class="w-full text-[10px]">
+                <thead class="bg-slate-100 text-slate-400 font-black uppercase">
+                    <tr>
+                        <th class="p-2 text-left">Producto</th>
+                        <th class="p-2 text-right">${isPrice ? 'Ayer' : 'Mercado'}</th>
+                        <th class="p-2 text-right">${isPrice ? 'Hoy' : 'Variación'}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">`;
+            
+            list.forEach(item => {
+                const isDown = item.varFloat < 0;
+                const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
+                
+                html += `<tr class="bg-white">
+                    <td class="p-2 font-bold text-slate-700">${item.name}</td>
+                    <td class="p-2 text-right text-slate-400">${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}</td>
+                    <td class="p-2 text-right ${isPrice ? 'font-black text-blue-700' : 'font-black ' + vColor}">
+                        ${isPrice ? 'S/' + item.priceToday.toFixed(2) : item.varStr}
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function closeModals() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('priceModal').style.display = 'none';
+            document.getElementById('varModal').style.display = 'none';
+        }
+
+        // --- Lógica del Buscador ---
         function quickSearch(val) {
             searchInput.value = val;
             searchInput.dispatchEvent(new Event('input'));
@@ -188,21 +311,21 @@
             if (matches.length > 0) {
                 suggestionsBox.classList.remove('hidden');
                 matches.forEach(item => {
-                    const isDown = item.variation.includes('-');
-                    const varColor = isDown ? 'text-green-500' : (item.variation === '0.0%' || item.variation === '0%' ? 'text-slate-400' : 'text-red-500');
-                    const varIcon = isDown ? 'fa-arrow-down' : (item.variation === '0.0%' || item.variation === '0%' ? 'fa-minus' : 'fa-arrow-up');
+                    const isDown = item.varFloat < 0;
+                    const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
+                    const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
 
                     const div = document.createElement('div');
-                    div.className = "p-4 hover:bg-blue-50 cursor-pointer border-b border-slate-100 flex justify-between items-center active:bg-blue-100 transition-colors";
+                    div.className = "p-4 hover:bg-blue-50 border-b border-slate-100 flex justify-between items-center active:bg-blue-100";
                     div.innerHTML = `
                         <div class="flex-1">
                             <span class="font-bold text-slate-700 block text-sm">${item.name}</span>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase">${item.market}</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">${item.market}</span>
                         </div>
                         <div class="text-right">
-                            <div class="font-black text-blue-600">S/ ${item.price.toFixed(2)}</div>
-                            <div class="text-[9px] font-black ${varColor} flex items-center justify-end">
-                                <i class="fas ${varIcon} mr-1"></i> ${item.variation}
+                            <div class="font-black text-blue-700">S/ ${item.priceToday.toFixed(2)}</div>
+                            <div class="text-[9px] font-black ${vColor}">
+                                <i class="fas ${vIcon} mr-0.5"></i> ${item.varStr}
                             </div>
                         </div>
                     `;
@@ -223,10 +346,7 @@
         }
 
         function clearCart() {
-            if(confirm("¿Vaciar toda tu lista?")) {
-                cart = [];
-                updateUI();
-            }
+            if(confirm("¿Vaciar lista?")) { cart = []; updateUI(); }
         }
 
         function updateUI() {
@@ -234,25 +354,35 @@
             let total = 0;
 
             if (cart.length === 0) {
-                quoteList.appendChild(emptyState);
+                quoteList.innerHTML = `<div class="bg-white/40 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
+                    <i class="fas fa-shopping-basket text-slate-200 text-4xl mb-3"></i>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Tu lista está vacía</p>
+                </div>`;
             } else {
                 cart.forEach((item, index) => {
-                    total += item.price;
+                    total += item.priceToday;
+                    const isDown = item.varFloat < 0;
+                    const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
+                    const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
+
                     const el = document.createElement('div');
                     el.className = "bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center fade-in";
                     el.innerHTML = `
-                        <div class="flex items-center flex-1">
-                            <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-black text-xs mr-3">
+                        <div class="flex items-center flex-1 pr-2">
+                            <div class="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-black text-[10px] mr-3 shrink-0">
                                 ${index + 1}
                             </div>
-                            <div class="pr-2">
-                                <h3 class="font-bold text-slate-700 text-sm leading-none mb-1">${item.name}</h3>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase">${item.market}</p>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-slate-700 text-sm truncate leading-none mb-1">${item.name}</h3>
+                                <div class="flex items-center text-[9px] font-black uppercase tracking-tighter">
+                                    <span class="text-slate-400 mr-2">${item.market}</span>
+                                    <span class="${vColor} flex items-center"><i class="fas ${vIcon} mr-0.5"></i>${item.varStr}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-center">
-                            <span class="font-black text-slate-800 mr-4">S/ ${item.price.toFixed(2)}</span>
-                            <button onclick="removeFromCart(${index})" class="text-slate-300 hover:text-red-500 p-2 transition-colors">
+                            <span class="font-black text-slate-800 mr-3 text-sm">S/ ${item.priceToday.toFixed(2)}</span>
+                            <button onclick="removeFromCart(${index})" class="text-slate-300 hover:text-red-500 transition-colors">
                                 <i class="fas fa-times-circle text-xl"></i>
                             </button>
                         </div>
@@ -263,22 +393,20 @@
             totalPriceEl.innerText = `S/ ${total.toFixed(2)}`;
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateUI();
-        }
+        function removeFromCart(index) { cart.splice(index, 1); updateUI(); }
 
         function shareQuote() {
-            if (cart.length === 0) return alert("¡Agrega algo a tu lista primero!");
+            if (cart.length === 0) return alert("¡Lista vacía!");
             let text = "*MI LISTA DE AHORRO* 🛒\n";
             text += `📅 _${fechaReporte.innerText}_\n\n`;
             let total = 0;
             cart.forEach(item => {
-                text += `• *${item.name}*: S/ ${item.price.toFixed(2)}\n`;
-                total += item.price;
+                const trend = item.varFloat < 0 ? '📉' : (item.varFloat > 0 ? '📈' : '➖');
+                text += `• *${item.name}*: S/ ${item.priceToday.toFixed(2)} ${trend} _(${item.varStr})_\n`;
+                total += item.priceToday;
             });
             text += `\n*TOTAL ESTIMADO: S/ ${total.toFixed(2)}*`;
-            text += `\n\n🔍 Revisa tú también aquí: ${window.location.href}`;
+            text += `\n\n🔍 Revisa tú también: ${window.location.href}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
