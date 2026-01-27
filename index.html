@@ -27,9 +27,16 @@
         .fade-in { animation: fadeIn 0.3s ease-out; }
         .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 15px 15px; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .modal-open { overflow: hidden; }
-        /* Estilo para asegurar que el porcentaje no se corte */
-        .col-val { min-width: 65px; text-align: right; white-space: nowrap; }
+        
+        /* Bloquear scroll del fondo cuando el modal está abierto */
+        body.modal-open { overflow: hidden; height: 100vh; }
+        
+        /* Asegurar que el porcentaje no se corte */
+        .col-val { min-width: 68px; text-align: right; white-space: nowrap; }
+
+        /* Animación para que la tabla suba suave */
+        .animate-full-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-pattern text-slate-800 font-sans antialiased min-h-screen pb-40">
@@ -38,25 +45,25 @@
     <header class="bg-blue-700 text-white p-4 shadow-xl sticky top-0 z-50">
         <div class="flex justify-between items-center max-w-lg mx-auto">
             <div>
-                <h1 class="text-xl font-black flex items-center tracking-tighter">
-                    <i class="fas fa-chart-line mr-2"></i> MONITOR DE PRECIOS
+                <h1 class="text-xl font-black flex items-center tracking-tighter uppercase italic">
+                    <i class="fas fa-chart-line mr-2 not-italic"></i> Monitor
                 </h1>
-                <p id="fechaReporte" class="text-[10px] text-blue-200 uppercase font-black tracking-widest mt-0.5">Sincronizando...</p>
+                <p id="fechaReporte" class="text-[10px] text-blue-200 uppercase font-black tracking-widest mt-0.5">Cargando...</p>
             </div>
-            <!-- Botón de Instalar (Visual por ahora) -->
-            <button onclick="installAppPrompt()" class="bg-blue-600 hover:bg-blue-500 text-[9px] font-black px-3 py-2 rounded-lg border border-white/20 flex items-center transition-all active:scale-95">
-                <i class="fas fa-mobile-alt mr-1.5"></i> INSTALAR
+            <!-- Botón de Instalar -->
+            <button onclick="installAppPrompt()" class="bg-blue-600 hover:bg-blue-500 text-[9px] font-black px-3 py-2 rounded-lg border border-white/20 flex items-center transition-all active:scale-95 shadow-inner">
+                <i class="fas fa-mobile-alt mr-1.5"></i> INSTALAR APP
             </button>
         </div>
     </header>
 
     <main class="max-w-lg mx-auto p-4">
 
-        <!-- Banner Oficial (TEXTO ACTUALIZADO) -->
-        <div class="bg-white border-b-4 border-blue-500 p-4 mb-6 rounded-xl shadow-md fade-in">
+        <!-- Banner Oficial -->
+        <div class="bg-white border-b-4 border-blue-600 p-4 mb-6 rounded-xl shadow-md fade-in">
             <div class="flex items-start">
                 <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                    <i class="fas fa-balance-scale text-blue-600"></i>
+                    <i class="fas fa-info-circle text-blue-600"></i>
                 </div>
                 <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
                     <strong class="text-blue-700 block mb-0.5 uppercase tracking-tighter text-xs">Información Oficial:</strong>
@@ -65,16 +72,16 @@
             </div>
         </div>
 
-        <!-- Dashboard de Análisis -->
+        <!-- Botones de Análisis -->
         <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="openPriceModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+            <button onclick="openPriceModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center active:bg-slate-50 transition-colors">
                 <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center mb-2">
                     <i class="fas fa-tags text-indigo-500"></i>
                 </div>
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1">Precios</span>
                 <span class="text-[11px] font-bold text-slate-700 leading-none">Los + Caros y Baratos</span>
             </button>
-            <button onclick="openVarModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+            <button onclick="openVarModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center active:bg-slate-50 transition-colors">
                 <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
                     <i class="fas fa-percentage text-emerald-500"></i>
                 </div>
@@ -85,14 +92,14 @@
 
         <!-- Buscador -->
         <div class="bg-white rounded-2xl shadow-xl p-5 mb-6 border border-slate-200 relative">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Buscador de Productos</label>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">¿Qué vas a comprar hoy?</label>
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-4 text-slate-300"></i>
                 <input type="text" id="searchInput" 
-                    placeholder="Escribe: Papa, Limón, Cebolla..." 
+                    placeholder="Busca papas, limón, cebolla..." 
                     inputmode="search"
                     class="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold"
-                    autocomplete="off" disabled>
+                    autocomplete="off">
                 
                 <div id="suggestions" class="absolute w-full bg-white shadow-2xl rounded-xl border border-slate-200 hidden max-h-[350px] overflow-y-auto z-50 mt-2"></div>
             </div>
@@ -114,7 +121,7 @@
         <div id="quoteList" class="space-y-3 mb-32">
             <div id="emptyState" class="bg-white/40 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
                 <i class="fas fa-shopping-basket text-slate-200 text-4xl mb-3"></i>
-                <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Tu lista está vacía</p>
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-widest leading-relaxed">Tu lista está vacía.<br>Agrega productos para calcular.</p>
             </div>
         </div>
 
@@ -127,58 +134,60 @@
                 <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Suma Total</p>
                 <p id="totalPrice" class="text-3xl font-black text-blue-900 tracking-tighter">S/ 0.00</p>
             </div>
-            <button onclick="shareQuote()" class="bg-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg flex items-center transition-all active:scale-95">
+            <button onclick="shareQuote()" class="bg-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg flex items-center active:scale-95 transition-all">
                 <i class="fab fa-whatsapp mr-2 text-xl"></i> PEDIR
             </button>
         </div>
     </div>
 
-    <!-- MODAL PRECIOS -->
-    <div id="priceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
-        <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black text-slate-800 uppercase italic">Extremos del Día</h3>
-                <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
+    <!-- MODAL PANTALLA COMPLETA (PRECIOS) -->
+    <div id="priceModal" class="fixed inset-0 bg-white z-[100] hidden flex-col animate-full-up">
+        <header class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
+            <h3 class="text-sm font-black uppercase italic tracking-widest">Extremos del Día</h3>
+            <button onclick="closeModals()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-4 space-y-8">
+            <div>
+                <h4 class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3 flex items-center">
+                    <i class="fas fa-arrow-circle-up mr-2"></i> Top 5: Los más caros
+                </h4>
+                <div id="topExpensive" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
             </div>
-            <div class="space-y-6">
-                <div>
-                    <h4 class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3 flex items-center">
-                        <i class="fas fa-arrow-circle-up mr-2"></i> Top 5: Los más caros
-                    </h4>
-                    <div id="topExpensive" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3 flex items-center">
-                        <i class="fas fa-arrow-circle-down mr-2"></i> Top 5: Los más económicos
-                    </h4>
-                    <div id="topCheap" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
-                </div>
+            <div>
+                <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3 flex items-center">
+                    <i class="fas fa-arrow-circle-down mr-2"></i> Top 5: Los más económicos
+                </h4>
+                <div id="topCheap" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
             </div>
         </div>
+        <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
     </div>
 
-    <!-- MODAL VARIACION -->
-    <div id="varModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
-        <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black text-slate-800 uppercase italic">Pulso de Variación %</h3>
-                <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
+    <!-- MODAL PANTALLA COMPLETA (VARIACION) -->
+    <div id="varModal" class="fixed inset-0 bg-white z-[100] hidden flex-col animate-full-up">
+        <header class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
+            <h3 class="text-sm font-black uppercase italic tracking-widest">Variaciones (%)</h3>
+            <button onclick="closeModals()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-4 space-y-8">
+            <div>
+                <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3 flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i> Top 5: Los que más subieron
+                </h4>
+                <div id="topUp" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
             </div>
-            <div class="space-y-6">
-                <div>
-                    <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3 flex items-center">
-                        <i class="fas fa-chart-line mr-2"></i> Top 5: Los que más subieron
-                    </h4>
-                    <div id="topUp" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3 flex items-center">
-                        <i class="fas fa-chart-line fa-flip-vertical mr-2"></i> Top 5: Los que más bajaron
-                    </h4>
-                    <div id="topDown" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
-                </div>
+            <div>
+                <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3 flex items-center">
+                    <i class="fas fa-chart-line fa-flip-vertical mr-2"></i> Top 5: Los que más bajaron
+                </h4>
+                <div id="topDown" class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100"></div>
             </div>
         </div>
+        <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
     </div>
 
     <script>
@@ -197,23 +206,25 @@
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch(CSV_URL);
+                if(!response.ok) throw new Error();
                 const csvText = await response.text();
                 procesarCSV(csvText);
-                statusBadge.innerText = "ONLINE";
+                statusBadge.innerText = "SISTEMA ONLINE";
                 statusBadge.className = "text-[9px] font-black bg-emerald-500 px-2 py-1 rounded-full text-white";
-                searchInput.disabled = false;
             } catch (e) {
-                statusBadge.innerText = "ERROR";
+                statusBadge.innerText = "ERROR CARGA";
+                statusBadge.className = "text-[9px] font-black bg-red-500 px-2 py-1 rounded-full text-white";
             }
         });
 
         function procesarCSV(text) {
             const lines = text.trim().split('\n');
+            if(lines.length < 2) return;
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
             colHoy = headers.length - 2;
             colAyer = headers.length - 3;
             colVar = headers.length - 1;
-            fechaReporte.innerText = `Precios de Hoy: ${headers[colHoy]}`;
+            fechaReporte.innerText = `Referencia: ${headers[colHoy]}`;
 
             for (let i = 1; i < lines.length; i++) {
                 const row = lines[i].split(',');
@@ -236,6 +247,7 @@
         }
 
         function openPriceModal() {
+            document.body.classList.add('modal-open');
             document.getElementById('priceModal').style.display = 'flex';
             const sorted = [...database].sort((a,b) => b.priceToday - a.priceToday);
             renderTable('topExpensive', sorted.slice(0, 5), true);
@@ -243,6 +255,7 @@
         }
 
         function openVarModal() {
+            document.body.classList.add('modal-open');
             document.getElementById('varModal').style.display = 'flex';
             const sorted = [...database].sort((a,b) => b.varFloat - a.varFloat);
             renderTable('topUp', sorted.slice(0, 5), false);
@@ -252,11 +265,11 @@
         function renderTable(containerId, list, isPrice) {
             const container = document.getElementById(containerId);
             let html = `<table class="w-full text-[10px] table-fixed">
-                <thead class="bg-slate-100 text-slate-400 font-black uppercase">
+                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
                     <tr>
-                        <th class="p-2 text-left">Producto</th>
-                        <th class="p-2 text-right w-16">${isPrice ? 'Ayer' : 'Mercado'}</th>
-                        <th class="p-2 text-right w-20">${isPrice ? 'Hoy' : 'Var %'}</th>
+                        <th class="p-3 text-left">Producto</th>
+                        <th class="p-3 text-right w-16">${isPrice ? 'Ayer' : 'Mercado'}</th>
+                        <th class="p-3 text-right w-20">${isPrice ? 'Hoy' : 'Var %'}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">`;
@@ -265,9 +278,9 @@
                 const isDown = item.varFloat < 0;
                 const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
                 html += `<tr class="bg-white">
-                    <td class="p-2 font-bold text-slate-700 truncate">${item.name}</td>
-                    <td class="p-2 text-right text-slate-400 whitespace-nowrap">${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}</td>
-                    <td class="p-2 text-right font-black col-val ${isPrice ? 'text-blue-700' : vColor}">
+                    <td class="p-3 font-bold text-slate-700 truncate">${item.name}</td>
+                    <td class="p-3 text-right text-slate-400 whitespace-nowrap">${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}</td>
+                    <td class="p-3 text-right font-black col-val ${isPrice ? 'text-blue-700' : vColor}">
                         ${isPrice ? 'S/' + item.priceToday.toFixed(2) : item.varStr}
                     </td>
                 </tr>`;
@@ -277,8 +290,10 @@
         }
 
         function closeModals() {
+            document.body.classList.remove('modal-open');
             document.getElementById('priceModal').style.display = 'none';
             document.getElementById('varModal').style.display = 'none';
+            searchInput.focus(); // VOLVER EL FOCO AL BUSCADOR
         }
 
         function quickSearch(val) {
@@ -332,7 +347,7 @@
             if (cart.length === 0) {
                 quoteList.innerHTML = `<div class="bg-white/40 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
                     <i class="fas fa-shopping-basket text-slate-200 text-4xl mb-3"></i>
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Tu lista está vacía</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest leading-relaxed">Tu lista está vacía.<br>Agrega productos para calcular.</p>
                 </div>`;
             } else {
                 cart.forEach((item, index) => {
@@ -387,9 +402,9 @@
         function installAppPrompt() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             if (isIOS) {
-                alert("Para instalar: Toca el botón 'Compartir' de tu navegador (el cuadrado con flecha) y selecciona 'Agregar al inicio'.");
+                alert("Instala esta App: Toca el botón 'Compartir' (el cuadrado con flecha) y selecciona 'Agregar al inicio'.");
             } else {
-                alert("Para instalar: Toca los 3 puntos de Chrome arriba a la derecha y selecciona 'Instalar aplicación' o 'Agregar a la pantalla de inicio'.");
+                alert("Instala esta App: Toca los 3 puntos de Chrome y selecciona 'Instalar aplicación' o 'Agregar a la pantalla de inicio'.");
             }
         }
 
