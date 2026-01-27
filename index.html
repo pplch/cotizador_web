@@ -28,6 +28,8 @@
         .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 15px 15px; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .modal-open { overflow: hidden; }
+        /* Estilo para asegurar que el porcentaje no se corte */
+        .col-val { min-width: 65px; text-align: right; white-space: nowrap; }
     </style>
 </head>
 <body class="bg-pattern text-slate-800 font-sans antialiased min-h-screen pb-40">
@@ -41,37 +43,38 @@
                 </h1>
                 <p id="fechaReporte" class="text-[10px] text-blue-200 uppercase font-black tracking-widest mt-0.5">Sincronizando...</p>
             </div>
-            <div id="statusBadge" class="text-[9px] font-black bg-blue-800 px-2 py-1 rounded-full border border-blue-400/30 uppercase">
-                ...
-            </div>
+            <!-- Botón de Instalar (Visual por ahora) -->
+            <button onclick="installAppPrompt()" class="bg-blue-600 hover:bg-blue-500 text-[9px] font-black px-3 py-2 rounded-lg border border-white/20 flex items-center transition-all active:scale-95">
+                <i class="fas fa-mobile-alt mr-1.5"></i> INSTALAR
+            </button>
         </div>
     </header>
 
     <main class="max-w-lg mx-auto p-4">
 
-        <!-- Banner Oficial -->
+        <!-- Banner Oficial (TEXTO ACTUALIZADO) -->
         <div class="bg-white border-b-4 border-blue-500 p-4 mb-6 rounded-xl shadow-md fade-in">
             <div class="flex items-start">
                 <div class="bg-blue-100 p-2 rounded-lg mr-3">
                     <i class="fas fa-balance-scale text-blue-600"></i>
                 </div>
                 <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                    <strong class="text-blue-700 block mb-0.5 uppercase tracking-tighter text-xs">Aviso Importante:</strong>
+                    <strong class="text-blue-700 block mb-0.5 uppercase tracking-tighter text-xs">Información Oficial:</strong>
                     Precios Referenciales: Basados en reporte oficial MIDAGRI (Kg por mayor). El precio final puede variar según calidad y puesto.
                 </p>
             </div>
         </div>
 
-        <!-- Dashboard de Análisis (Botones Superiores) -->
+        <!-- Dashboard de Análisis -->
         <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="openPriceModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+            <button onclick="openPriceModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
                 <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center mb-2">
                     <i class="fas fa-tags text-indigo-500"></i>
                 </div>
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1">Precios</span>
                 <span class="text-[11px] font-bold text-slate-700 leading-none">Los + Caros y Baratos</span>
             </button>
-            <button onclick="openVarModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
+            <button onclick="openVarModal()" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-transform active:scale-95">
                 <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
                     <i class="fas fa-percentage text-emerald-500"></i>
                 </div>
@@ -130,14 +133,13 @@
         </div>
     </div>
 
-    <!-- MODAL PRECIOS (CAROS/BARATOS) -->
+    <!-- MODAL PRECIOS -->
     <div id="priceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
         <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-black text-slate-800 uppercase italic">Los Extremos del Día</h3>
+                <h3 class="text-lg font-black text-slate-800 uppercase italic">Extremos del Día</h3>
                 <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
             </div>
-            
             <div class="space-y-6">
                 <div>
                     <h4 class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3 flex items-center">
@@ -155,14 +157,13 @@
         </div>
     </div>
 
-    <!-- MODAL VARIACION (SUBIERON/BAJARON) -->
+    <!-- MODAL VARIACION -->
     <div id="varModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end justify-center">
         <div class="bg-white w-full max-w-lg rounded-t-3xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-black text-slate-800 uppercase italic">Pulso de Variación %</h3>
                 <button onclick="closeModals()" class="text-slate-400 text-2xl"><i class="fas fa-times-circle"></i></button>
             </div>
-            
             <div class="space-y-6">
                 <div>
                     <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3 flex items-center">
@@ -203,15 +204,12 @@
                 searchInput.disabled = false;
             } catch (e) {
                 statusBadge.innerText = "ERROR";
-                statusBadge.className = "text-[9px] font-black bg-red-500 px-2 py-1 rounded-full text-white";
             }
         });
 
         function procesarCSV(text) {
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            
-            // Indices
             colHoy = headers.length - 2;
             colAyer = headers.length - 3;
             colVar = headers.length - 1;
@@ -220,12 +218,10 @@
             for (let i = 1; i < lines.length; i++) {
                 const row = lines[i].split(',');
                 if (row.length < headers.length) continue;
-
                 const pHoy = parseFloat(row[colHoy]);
                 const pAyer = parseFloat(row[colAyer]);
                 const vStr = row[colVar] ? row[colVar].replace(/"/g, '') : "0.0%";
                 const vFloat = parseFloat(vStr.replace('%','')) || 0;
-
                 if (!isNaN(pHoy) && row[1]) {
                     database.push({
                         name: row[1].replace(/"/g, '').trim(),
@@ -239,22 +235,15 @@
             }
         }
 
-        // --- Lógica de Modales ---
         function openPriceModal() {
-            document.body.classList.add('modal-open');
             document.getElementById('priceModal').style.display = 'flex';
-            
-            // Ordenar por precio hoy descendente
             const sorted = [...database].sort((a,b) => b.priceToday - a.priceToday);
             renderTable('topExpensive', sorted.slice(0, 5), true);
             renderTable('topCheap', sorted.slice(-5).reverse(), true);
         }
 
         function openVarModal() {
-            document.body.classList.add('modal-open');
             document.getElementById('varModal').style.display = 'flex';
-            
-            // Ordenar por variación % descendente
             const sorted = [...database].sort((a,b) => b.varFloat - a.varFloat);
             renderTable('topUp', sorted.slice(0, 5), false);
             renderTable('topDown', sorted.slice(-5).reverse(), false);
@@ -262,12 +251,12 @@
 
         function renderTable(containerId, list, isPrice) {
             const container = document.getElementById(containerId);
-            let html = `<table class="w-full text-[10px]">
+            let html = `<table class="w-full text-[10px] table-fixed">
                 <thead class="bg-slate-100 text-slate-400 font-black uppercase">
                     <tr>
                         <th class="p-2 text-left">Producto</th>
-                        <th class="p-2 text-right">${isPrice ? 'Ayer' : 'Mercado'}</th>
-                        <th class="p-2 text-right">${isPrice ? 'Hoy' : 'Variación'}</th>
+                        <th class="p-2 text-right w-16">${isPrice ? 'Ayer' : 'Mercado'}</th>
+                        <th class="p-2 text-right w-20">${isPrice ? 'Hoy' : 'Var %'}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">`;
@@ -275,11 +264,10 @@
             list.forEach(item => {
                 const isDown = item.varFloat < 0;
                 const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
-                
                 html += `<tr class="bg-white">
-                    <td class="p-2 font-bold text-slate-700">${item.name}</td>
-                    <td class="p-2 text-right text-slate-400">${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}</td>
-                    <td class="p-2 text-right ${isPrice ? 'font-black text-blue-700' : 'font-black ' + vColor}">
+                    <td class="p-2 font-bold text-slate-700 truncate">${item.name}</td>
+                    <td class="p-2 text-right text-slate-400 whitespace-nowrap">${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}</td>
+                    <td class="p-2 text-right font-black col-val ${isPrice ? 'text-blue-700' : vColor}">
                         ${isPrice ? 'S/' + item.priceToday.toFixed(2) : item.varStr}
                     </td>
                 </tr>`;
@@ -289,12 +277,10 @@
         }
 
         function closeModals() {
-            document.body.classList.remove('modal-open');
             document.getElementById('priceModal').style.display = 'none';
             document.getElementById('varModal').style.display = 'none';
         }
 
-        // --- Lógica del Buscador ---
         function quickSearch(val) {
             searchInput.value = val;
             searchInput.dispatchEvent(new Event('input'));
@@ -305,36 +291,29 @@
             const query = e.target.value.toLowerCase();
             suggestionsBox.innerHTML = '';
             if (query.length < 2) { suggestionsBox.classList.add('hidden'); return; }
-
             const matches = database.filter(item => item.name.toLowerCase().includes(query)).slice(0, 10);
-            
             if (matches.length > 0) {
                 suggestionsBox.classList.remove('hidden');
                 matches.forEach(item => {
                     const isDown = item.varFloat < 0;
                     const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
                     const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-
                     const div = document.createElement('div');
                     div.className = "p-4 hover:bg-blue-50 border-b border-slate-100 flex justify-between items-center active:bg-blue-100";
                     div.innerHTML = `
-                        <div class="flex-1">
-                            <span class="font-bold text-slate-700 block text-sm">${item.name}</span>
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">${item.market}</span>
+                        <div class="flex-1 min-w-0 pr-2">
+                            <span class="font-bold text-slate-700 block text-sm truncate">${item.name}</span>
+                            <span class="text-[9px] text-slate-400 font-black uppercase tracking-tighter">${item.market}</span>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                             <div class="font-black text-blue-700">S/ ${item.priceToday.toFixed(2)}</div>
-                            <div class="text-[9px] font-black ${vColor}">
-                                <i class="fas ${vIcon} mr-0.5"></i> ${item.varStr}
-                            </div>
+                            <div class="text-[9px] font-black ${vColor}"><i class="fas ${vIcon} mr-0.5"></i> ${item.varStr}</div>
                         </div>
                     `;
                     div.onclick = () => addToCart(item);
                     suggestionsBox.appendChild(div);
                 });
-            } else {
-                suggestionsBox.classList.add('hidden');
-            }
+            } else { suggestionsBox.classList.add('hidden'); }
         });
 
         function addToCart(item) {
@@ -345,14 +324,11 @@
             searchInput.blur();
         }
 
-        function clearCart() {
-            if(confirm("¿Vaciar lista?")) { cart = []; updateUI(); }
-        }
+        function clearCart() { if(confirm("¿Vaciar lista?")) { cart = []; updateUI(); } }
 
         function updateUI() {
             quoteList.innerHTML = '';
             let total = 0;
-
             if (cart.length === 0) {
                 quoteList.innerHTML = `<div class="bg-white/40 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
                     <i class="fas fa-shopping-basket text-slate-200 text-4xl mb-3"></i>
@@ -364,11 +340,10 @@
                     const isDown = item.varFloat < 0;
                     const vColor = isDown ? 'text-emerald-500' : (item.varFloat > 0 ? 'text-red-500' : 'text-slate-400');
                     const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-
                     const el = document.createElement('div');
                     el.className = "bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center fade-in";
                     el.innerHTML = `
-                        <div class="flex items-center flex-1 pr-2">
+                        <div class="flex items-center flex-1 min-w-0 pr-2">
                             <div class="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-black text-[10px] mr-3 shrink-0">
                                 ${index + 1}
                             </div>
@@ -376,11 +351,11 @@
                                 <h3 class="font-bold text-slate-700 text-sm truncate leading-none mb-1">${item.name}</h3>
                                 <div class="flex items-center text-[9px] font-black uppercase tracking-tighter">
                                     <span class="text-slate-400 mr-2">${item.market}</span>
-                                    <span class="${vColor} flex items-center"><i class="fas ${vIcon} mr-0.5"></i>${item.varStr}</span>
+                                    <span class="${vColor} flex items-center whitespace-nowrap"><i class="fas ${vIcon} mr-0.5"></i>${item.varStr}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center">
+                        <div class="flex items-center shrink-0">
                             <span class="font-black text-slate-800 mr-3 text-sm">S/ ${item.priceToday.toFixed(2)}</span>
                             <button onclick="removeFromCart(${index})" class="text-slate-300 hover:text-red-500 transition-colors">
                                 <i class="fas fa-times-circle text-xl"></i>
@@ -406,8 +381,16 @@
                 total += item.priceToday;
             });
             text += `\n*TOTAL ESTIMADO: S/ ${total.toFixed(2)}*`;
-            text += `\n\n🔍 Revisa tú también: ${window.location.href}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function installAppPrompt() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                alert("Para instalar: Toca el botón 'Compartir' de tu navegador (el cuadrado con flecha) y selecciona 'Agregar al inicio'.");
+            } else {
+                alert("Para instalar: Toca los 3 puntos de Chrome arriba a la derecha y selecciona 'Instalar aplicación' o 'Agregar a la pantalla de inicio'.");
+            }
         }
 
         document.addEventListener('click', (e) => {
