@@ -244,8 +244,8 @@
                 <thead class="bg-slate-200 text-slate-500 font-black uppercase">
                     <tr>
                         <th class="p-3 text-left">Producto</th>
-                        <th class="p-3 text-right w-20">${isPrice ? 'Ayer' : 'Mercado'}</th>
-                        <th class="p-3 text-right w-24">${isPrice ? 'Hoy' : 'Var %'}</th>
+                        <th class="p-3 text-right w-32">${isPrice ? 'Ayer' : 'Var %'}</th>
+                        ${isPrice ? '<th class="p-3 text-right w-24">Hoy</th>' : ''}
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">`;
@@ -265,10 +265,12 @@
 
                 html += `<tr class="bg-white hover:bg-slate-50">
                     <td class="p-3 font-bold text-slate-800 truncate">${item.name}</td>
-                    <td class="p-3 text-right price-number ${isPrice ? 'text-slate-500 font-medium' : 'text-slate-700 font-semibold'} whitespace-nowrap">
-                        ${isPrice ? 'S/' + (item.priceYesterday || 0).toFixed(2) : item.market}
-                    </td>
-                    <td class="p-3 text-right font-bold col-val ${finalPriceColor} price-number">
+                    ${isPrice ? 
+                        `<td class="p-3 text-right price-number text-slate-500 font-medium whitespace-nowrap">
+                            S/${(item.priceYesterday || 0).toFixed(2)}
+                        </td>` 
+                    : ''}
+                    <td class="p-3 text-right font-bold col-val ${finalPriceColor} price-number ${isPrice ? 'w-24' : 'w-32'}">
                         ${isPrice ? 'S/' + item.priceToday.toFixed(2) : item.varStr}
                     </td>
                 </tr>`;
@@ -426,3 +428,4 @@
     </script>
 </body>
 </html>
+
