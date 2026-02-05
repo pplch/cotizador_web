@@ -134,29 +134,35 @@
         </div>
     </div>
 
-    <!-- MODAL PRECIOS -->
+
+    <!-- MODAL PRECIOS (VERSIÓN UNIFICADA) -->
     <div id="priceModal" class="fixed inset-0 bg-white z-[100] hidden flex-col animate-full-up">
         <header class="bg-slate-900 text-white p-4 flex justify-between items-center">
-            <h3 class="text-sm font-black uppercase italic tracking-widest">Extremos del Día</h3>
+            <h3 class="text-sm font-black uppercase italic tracking-widest">Ranking de Precios</h3>
             <button onclick="closeModals()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         </header>
-        <div class="flex-1 overflow-y-auto p-4 space-y-8">
-            <div>
-                <h4 class="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3 flex items-center"><i class="fas fa-arrow-circle-up mr-2"></i> Top 5: Los más caros</h4>
-                <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                    <div id="topExpensive" class="price-table min-w-full"></div>
-                </div>
-            </div>
-            <div>
-                <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3 flex items-center"><i class="fas fa-arrow-circle-down mr-2"></i> Top 5: Los más económicos</h4>
-                <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                    <div id="topCheap" class="price-table min-w-full"></div>
-                </div>
-            </div>
-        </div>
-        <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
+    
+        <!-- BOTONES DE ORDEN - NUEVO -->
+        <div class="flex border-b border-slate-200">
+            <button id="btnDesc" onclick="setPriceOrder('desc')" class="flex-1 py-3 text-center text-sm font-bold bg-blue-50 text-blue-700 border-r border-slate-200">
+                <i class="fas fa-arrow-down mr-2"></i>De más caros a económicos
+            </button>
+            <button id="btnAsc" onclick="setPriceOrder('asc')" class="flex-1 py-3 text-center text-sm font-bold text-slate-600">
+                <i class="fas fa-arrow-up mr-2"></i>De más económicos a caros
+            </button>
     </div>
+    
+    <!-- TABLA ÚNICA - NUEVO -->
+    <div class="flex-1 overflow-y-auto p-4">
+        <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+            <div id="priceRankingTable" class="price-table min-w-full"></div>
+        </div>
+    </div>
+    
+    <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
+</div>
 
+    
     <!-- MODAL VARIACION -->
     <div id="varModal" class="fixed inset-0 bg-white z-[100] hidden flex-col animate-full-up">
         <header class="bg-slate-900 text-white p-4 flex justify-between items-center">
@@ -185,6 +191,8 @@
         let database = [];
         let cart = [];
         let colHoy = -1, colAyer = -1, colVar = -1;
+        // NUEVA VARIABLE PARA CONTROLAR ORDEN DE PRECIOS
+        let currentPriceOrder = 'desc'; // 'desc' = más caros primero, 'asc' = más baratos primero
 
         const searchInput = document.getElementById('searchInput');
         const suggestionsBox = document.getElementById('suggestions');
@@ -235,58 +243,106 @@
             }
         }
 
-        function renderTable(containerId, list, isPrice) {
-            const container = document.getElementById(containerId);
-            const isTopExpensive = containerId === 'topExpensive';
-            const isTopCheap = containerId === 'topCheap';
-
+        // FUNCIÓN MODIFICADA: Renderizar tabla de ranking (REEMPLAZA LA VIEJA renderTable)
+        function renderRankingTable(list) {
+            const container = document.getElementById('priceRankingTable');
+    
             let html = `<table class="w-full text-[11px] table-auto">
                 <thead class="bg-slate-200 text-slate-500 font-black uppercase">
                     <tr>
+                        <th class="p-3 text-left w-16">#</th>
                         <th class="p-3 text-left">Producto</th>
-                        <th class="p-3 text-right w-32">${isPrice ? 'Ayer' : 'Var %'}</th>
-                        ${isPrice ? '<th class="p-3 text-right w-24">Hoy</th>' : ''}
+                        <th class="p-3 text-right w-32">Ayer</th>
+                        <th class="p-3 text-right w-24">Hoy</th>
+                        <th class="p-3 text-right w-28">Var %</th>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">`;
-            
-            list.forEach(item => {
-                const isDown = item.varFloat < 0;
-                let vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
-                
-                // Color específico para la tabla de Precios
-                let finalPriceColor = 'text-blue-800 font-bold';
-                if (isPrice) {
-                    if (isTopExpensive) finalPriceColor = 'text-red-700 font-bold';
-                    if (isTopCheap) finalPriceColor = 'text-emerald-700 font-bold';
-                } else {
-                    finalPriceColor = vColor + ' font-bold';
-                }
-
-                html += `<tr class="bg-white hover:bg-slate-50">
-                    <td class="p-3 font-bold text-slate-800 truncate">${item.name}</td>
-                    ${isPrice ? 
-                        `<td class="p-3 text-right price-number text-slate-500 font-medium whitespace-nowrap">
-                            S/${(item.priceYesterday || 0).toFixed(2)}
-                        </td>` 
-                    : ''}
-                    <td class="p-3 text-right font-bold col-val ${finalPriceColor} price-number ${isPrice ? 'w-24' : 'w-32'}">
-                        ${isPrice ? 'S/' + item.priceToday.toFixed(2) : item.varStr}
-                    </td>
-                </tr>`;
-            });
-            html += `</tbody></table>`;
-            container.innerHTML = html;
-        }
-
+        </thead>
+        <tbody class="divide-y divide-slate-100">`;
+    
+    list.forEach(item => {
+        const isDown = item.varFloat < 0;
+        const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+        const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
+        
+        html += `<tr class="bg-white hover:bg-slate-50">
+            <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+            <td class="p-3 font-bold text-slate-800 truncate">
+                ${item.name}
+                <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
+            </td>
+            <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+            <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+            <td class="p-3 text-right font-bold ${vColor} price-number">
+                <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+            </td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
         function openPriceModal() {
             document.body.classList.add('modal-open');
             document.getElementById('priceModal').style.display = 'flex';
-            const sorted = [...database].sort((a,b) => b.priceToday - a.priceToday);
-            renderTable('topExpensive', sorted.slice(0, 5), true);
-            renderTable('topCheap', sorted.slice(-5).reverse(), true);
+    
+            // Botón "desc" activo por defecto (más caros primero)
+            document.getElementById('btnDesc').classList.add('bg-blue-50', 'text-blue-700');
+            document.getElementById('btnDesc').classList.remove('text-slate-600');
+            document.getElementById('btnAsc').classList.remove('bg-blue-50', 'text-blue-700');
+            document.getElementById('btnAsc').classList.add('text-slate-600');
+    
+            // Mostrar ranking inicial (orden descendente: más caros primero)
+            updatePriceRanking('desc');
         }
-
+        
+        // NUEVA FUNCIÓN: Cambiar orden del ranking
+        function setPriceOrder(order) {
+            currentPriceOrder = order;
+            updatePriceRanking(order);
+    
+            // Actualizar botones visualmente
+            if (order === 'desc') {
+                document.getElementById('btnDesc').classList.add('bg-blue-50', 'text-blue-700');
+                document.getElementById('btnDesc').classList.remove('text-slate-600');
+                document.getElementById('btnAsc').classList.remove('bg-blue-50', 'text-blue-700');
+                document.getElementById('btnAsc').classList.add('text-slate-600');
+            } else {
+                document.getElementById('btnAsc').classList.add('bg-blue-50', 'text-blue-700');
+                document.getElementById('btnAsc').classList.remove('text-slate-600');
+                document.getElementById('btnDesc').classList.remove('bg-blue-50', 'text-blue-700');
+                document.getElementById('btnDesc').classList.add('text-slate-600');
+            }
+    }
+        
+        // NUEVA FUNCIÓN: Actualizar tabla de ranking
+        function updatePriceRanking(order) {
+            // 1. Filtrar productos válidos (precio > 0, no categorías)
+            const validProducts = database.filter(item => 
+                item.priceToday > 0 && 
+                !item.name.match(/^\d{2,4}\s+[A-Z]/) &&
+                item.market !== ''
+        );
+    
+        // 2. Ordenar según el orden solicitado
+        let sorted;
+        if (order === 'desc') {
+            // Más caros primero
+            sorted = [...validProducts].sort((a, b) => b.priceToday - a.priceToday);
+        } else {
+            // Más baratos primero
+            sorted = [...validProducts].sort((a, b) => a.priceToday - b.priceToday);
+        }
+    
+        // 3. Agregar posición (ranking)
+        const rankedProducts = sorted.map((item, index) => ({
+            ...item,
+            position: index + 1
+        }));
+    
+        // 4. Renderizar tabla única
+        renderRankingTable(rankedProducts);
+    }
+        
         function openVarModal() {
             document.body.classList.add('modal-open');
             document.getElementById('varModal').style.display = 'flex';
@@ -428,6 +484,7 @@
     </script>
 </body>
 </html>
+
 
 
 
