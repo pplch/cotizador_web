@@ -163,28 +163,32 @@
 </div>
 
     
-    <!-- MODAL VARIACION -->
+    <!-- MODAL VARIACIÓN (VERSIÓN UNIFICADA) -->
     <div id="varModal" class="fixed inset-0 bg-white z-[100] hidden flex-col animate-full-up">
         <header class="bg-slate-900 text-white p-4 flex justify-between items-center">
-            <h3 class="text-sm font-black uppercase italic tracking-widest">Variaciones (%)</h3>
+            <h3 class="text-sm font-black uppercase italic tracking-widest">Variaciones %</h3>
             <button onclick="closeModals()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         </header>
-        <div class="flex-1 overflow-y-auto p-4 space-y-8">
-            <div>
-                <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3 flex items-center"><i class="fas fa-chart-line mr-2"></i> Top 5: Los que más subieron</h4>
-                <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                    <div id="topUp" class="price-table min-w-full"></div>
-                </div>
-            </div>
-            <div>
-                <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3 flex items-center"><i class="fas fa-chart-line fa-flip-vertical mr-2"></i> Top 5: Los que más bajaron</h4>
-                <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                    <div id="topDown" class="price-table min-w-full"></div>
-                </div>
-            </div>
-        </div>
-        <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
+    
+        <!-- BOTONES DE ORDEN - NUEVO -->
+        <div class="flex border-b border-slate-200">
+            <button id="btnVarDesc" onclick="setVarOrder('desc')" class="flex-1 py-3 text-center text-sm font-bold bg-orange-50 text-orange-700 border-r border-slate-200">
+                <i class="fas fa-chart-line mr-2"></i>Los que más subieron
+            </button>
+            <button id="btnVarAsc" onclick="setVarOrder('asc')" class="flex-1 py-3 text-center text-sm font-bold text-slate-600">
+                <i class="fas fa-chart-line fa-flip-vertical mr-2"></i>Los que más bajaron
+            </button>
     </div>
+    
+    <!-- TABLA ÚNICA - NUEVO -->
+    <div class="flex-1 overflow-y-auto p-4">
+        <div class="table-container bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+            <div id="varRankingTable" class="price-table min-w-full"></div>
+        </div>
+    </div>
+    
+    <button onclick="closeModals()" class="m-4 p-4 bg-slate-900 text-white font-black rounded-2xl uppercase tracking-widest text-xs">Cerrar y volver</button>
+</div>
 
     <script>
         const CSV_URL = 'data/precios_mercado.csv'; 
@@ -193,6 +197,8 @@
         let colHoy = -1, colAyer = -1, colVar = -1;
         // NUEVA VARIABLE PARA CONTROLAR ORDEN DE PRECIOS
         let currentPriceOrder = 'desc'; // 'desc' = más caros primero, 'asc' = más baratos primero
+        // NUEVA VARIABLE PARA CONTROLAR ORDEN DE VARIACIÓN
+        let currentVarOrder = 'desc'; // 'desc' = más subieron primero, 'asc' = más bajaron primero
 
         const searchInput = document.getElementById('searchInput');
         const suggestionsBox = document.getElementById('suggestions');
@@ -292,13 +298,13 @@
             document.getElementById('btnAsc').classList.add('text-slate-600');
     
             // Mostrar ranking inicial (orden descendente: más caros primero)
-            updatePriceRanking('desc');
+            renderRankingTable('desc');
         }
         
         // NUEVA FUNCIÓN: Cambiar orden del ranking
         function setPriceOrder(order) {
             currentPriceOrder = order;
-            updatePriceRanking(order);
+            renderRankingTable(order);
     
             // Actualizar botones visualmente
             if (order === 'desc') {
@@ -311,6 +317,25 @@
                 document.getElementById('btnAsc').classList.remove('text-slate-600');
                 document.getElementById('btnDesc').classList.remove('bg-blue-50', 'text-blue-700');
                 document.getElementById('btnDesc').classList.add('text-slate-600');
+            }
+    }
+
+        // NUEVA FUNCIÓN: Cambiar orden del ranking de variación
+        function setVarOrder(order) {
+            currentVarOrder = order;
+            updateVarRanking(order);
+    
+            // Actualizar botones visualmente
+            if (order === 'desc') {
+                document.getElementById('btnVarDesc').classList.add('bg-orange-50', 'text-orange-700');
+                document.getElementById('btnVarDesc').classList.remove('text-slate-600');
+                document.getElementById('btnVarAsc').classList.remove('bg-orange-50', 'text-orange-700');
+                document.getElementById('btnVarAsc').classList.add('text-slate-600');
+            } else {
+                document.getElementById('btnVarAsc').classList.add('bg-orange-50', 'text-orange-700');
+                document.getElementById('btnVarAsc').classList.remove('text-slate-600');
+                document.getElementById('btnVarDesc').classList.remove('bg-orange-50', 'text-orange-700');
+                document.getElementById('btnVarDesc').classList.add('text-slate-600');
             }
     }
         
@@ -342,15 +367,94 @@
         // 4. Renderizar tabla única
         renderRankingTable(rankedProducts);
     }
+
+        // NUEVA FUNCIÓN: Renderizar tabla de ranking de variación
+        function renderVarRankingTable(list) {
+            const container = document.getElementById('varRankingTable');
+    
+            let html = `<table class="w-full text-[11px] table-auto">
+                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
+                    <tr>
+                        <th class="p-3 text-left w-16">#</th>
+                        <th class="p-3 text-left">Producto</th>
+                        <th class="p-3 text-right w-32">Precio Hoy</th>
+                        <th class="p-3 text-right w-24">Precio Ayer</th>
+                        <th class="p-3 text-right w-28">Var %</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">`;
+    
+        list.forEach(item => {
+            const isDown = item.varFloat < 0;
+            const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+            const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
         
+            // Color especial para variaciones extremas
+            let varCellClass = `p-3 text-right font-bold ${vColor} price-number`;
+            if (Math.abs(item.varFloat) > 20) { // Variación > 20%
+            varCellClass += ' text-lg';
+            }
+        
+            html += `<tr class="bg-white hover:bg-slate-50">
+                <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+                <td class="p-3 font-bold text-slate-800 truncate">
+                    ${item.name}
+                    <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
+                </td>
+                <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+                <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+                <td class="${varCellClass}">
+                    <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+                </td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+        
+        // NUEVA FUNCIÓN: Actualizar tabla de ranking de variación
+        function updateVarRanking(order) {
+            // 1. Filtrar productos válidos (precio > 0, no categorías, con variación definida)
+            const validProducts = database.filter(item => 
+                item.priceToday > 0 && 
+                !item.name.match(/^\d{2,4}\s+[A-Z]/) &&
+                item.market !== '' &&
+                !isNaN(item.varFloat)
+            );
+    
+            // 2. Ordenar según el orden solicitado
+            let sorted;
+            if (order === 'desc') {
+                // Más subieron primero (variación positiva más alta)
+                sorted = [...validProducts].sort((a, b) => b.varFloat - a.varFloat);
+            } else {
+                // Más bajaron primero (variación negativa más baja)
+                sorted = [...validProducts].sort((a, b) => a.varFloat - b.varFloat);
+            }
+    
+            // 3. Agregar posición (ranking)
+            const rankedProducts = sorted.map((item, index) => ({
+                ...item,
+                position: index + 1
+            }));
+    
+            // 4. Renderizar tabla única de variación
+            renderVarRankingTable(rankedProducts);
+    }
         function openVarModal() {
             document.body.classList.add('modal-open');
             document.getElementById('varModal').style.display = 'flex';
-            const sorted = [...database].sort((a,b) => b.varFloat - a.varFloat);
-            renderTable('topUp', sorted.slice(0, 5), false);
-            renderTable('topDown', sorted.slice(-5).reverse(), false);
-        }
-
+    
+            // Botón "desc" activo por defecto (más subieron primero)
+            document.getElementById('btnVarDesc').classList.add('bg-orange-50', 'text-orange-700');
+            document.getElementById('btnVarDesc').classList.remove('text-slate-600');
+            document.getElementById('btnVarAsc').classList.remove('bg-orange-50', 'text-orange-700');
+            document.getElementById('btnVarAsc').classList.add('text-slate-600');
+    
+            // Mostrar ranking inicial (orden descendente: más subieron primero)
+            updateVarRanking('desc');
+    }
         function closeModals() {
             document.body.classList.remove('modal-open');
             document.getElementById('priceModal').style.display = 'none';
@@ -484,6 +588,7 @@
     </script>
 </body>
 </html>
+
 
 
 
