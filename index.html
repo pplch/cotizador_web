@@ -298,13 +298,13 @@
             document.getElementById('btnAsc').classList.add('text-slate-600');
     
             // Mostrar ranking inicial (orden descendente: más caros primero)
-            renderRankingTable('desc');
+            updatePriceRanking('desc');
         }
         
         // NUEVA FUNCIÓN: Cambiar orden del ranking
         function setPriceOrder(order) {
             currentPriceOrder = order;
-            renderRankingTable(order);
+            updatePriceRanking(order);
     
             // Actualizar botones visualmente
             if (order === 'desc') {
@@ -588,6 +588,7 @@
     </script>
 </body>
 </html>
+
 
 
 
