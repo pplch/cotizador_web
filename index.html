@@ -296,7 +296,7 @@
     const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
     
     html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
-                ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                 
         <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
         <td class="p-3 font-bold text-slate-800 truncate">
@@ -681,6 +681,7 @@ container.innerHTML = html;
     </script>
 </body>
 </html>
+
 
 
 
