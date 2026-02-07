@@ -297,8 +297,7 @@
     
     html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
                 ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                ontouchstart="iniciarTap(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                ontouchend="terminarTap(this)">
+                
         <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
         <td class="p-3 font-bold text-slate-800 truncate">
             ${item.name}
@@ -425,8 +424,7 @@
 
             html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
                     ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                    ontouchstart="iniciarTap(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                    ontouchend="terminarTap(this)">
+                    
             <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
             <td class="p-3 font-bold text-slate-800 truncate">
                 ${item.name}
@@ -596,22 +594,7 @@ container.innerHTML = html;
             mostrarNotificacion(`✅ Producto agregado: "${item.name}"`);
         }
 
-        // 2. INICIAR TAP (móvil - touchstart)
-        let tapTimer;
-        function iniciarTap(elemento, item) {
-            tapTimer = setTimeout(() => {
-                // TAP LARGO (mantener > 500ms)
-                elemento.classList.add('bg-green-100');
-                agregarDesdeModal(item);
-            }, 500); // 500ms = medio segundo
-        }
-
-        // 3. TERMINAR TAP (móvil - touchend)
-        function terminarTap(elemento) {
-            clearTimeout(tapTimer);
-            elemento.classList.remove('bg-green-100');
-        }
-
+        
         // 4. MOSTRAR NOTIFICACIÓN
         function mostrarNotificacion(mensaje) {
             // Crear notificación
@@ -698,6 +681,7 @@ container.innerHTML = html;
     </script>
 </body>
 </html>
+
 
 
 
