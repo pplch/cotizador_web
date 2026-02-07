@@ -38,6 +38,29 @@
         .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .price-table { min-width: 280px; }
         .price-number { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: 0.5px; }
+
+        /* Animación para notificaciones */
+        .animate-fade-in {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Clase para fila seleccionada (tap largo) */
+        .bg-green-100 {
+            background-color: #d1fae5 !important;
+            transition: background-color 0.2s;
+        }
+        
     </style>
 </head>
 <body class="bg-pattern text-slate-800 font-sans antialiased min-h-screen pb-40">
@@ -267,24 +290,27 @@
         </thead>
         <tbody class="divide-y divide-slate-100">`;
     
-    list.forEach(item => {
-        const isDown = item.varFloat < 0;
-        const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
-        const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-        
-        html += `<tr class="bg-white hover:bg-slate-50">
-            <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
-            <td class="p-3 font-bold text-slate-800 truncate">
-                ${item.name}
-                <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
-            </td>
-            <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
-            <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
-            <td class="p-3 text-right font-bold ${vColor} price-number">
-                <i class="fas ${vIcon} mr-1"></i>${item.varStr}
-            </td>
-        </tr>`;
-    });
+   list.forEach(item => {
+    const isDown = item.varFloat < 0;
+    const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+    const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
+    
+    html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
+                ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                ontouchstart="iniciarTap(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                ontouchend="terminarTap(this)">
+        <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+        <td class="p-3 font-bold text-slate-800 truncate">
+            ${item.name}
+            <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
+        </td>
+        <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+        <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+        <td class="p-3 text-right font-bold ${vColor} price-number">
+            <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+        </td>
+    </tr>`;
+});
     
     html += `</tbody></table>`;
     container.innerHTML = html;
@@ -390,29 +416,33 @@
             const isDown = item.varFloat < 0;
             const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
             const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-        
+
             // Color especial para variaciones extremas
             let varCellClass = `p-3 text-right font-bold ${vColor} price-number`;
             if (Math.abs(item.varFloat) > 20) { // Variación > 20%
-            varCellClass += ' text-lg';
+                varCellClass += ' text-lg';
             }
-        
-            html += `<tr class="bg-white hover:bg-slate-50">
-                <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
-                <td class="p-3 font-bold text-slate-800 truncate">
-                    ${item.name}
-                    <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
-                </td>
-                <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
-                <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
-                <td class="${varCellClass}">
-                    <i class="fas ${vIcon} mr-1"></i>${item.varStr}
-                </td>
-        </tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+
+            html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
+                    ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                    ontouchstart="iniciarTap(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                    ontouchend="terminarTap(this)">
+            <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+            <td class="p-3 font-bold text-slate-800 truncate">
+                ${item.name}
+                <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
+            </td>
+            <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+            <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+            <td class="${varCellClass}">
+                <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+            </td>
+    </tr>`;
+});
+
+// ESTAS 2 LÍNEAS LAS DEJAS IGUAL, NO LAS CAMBIES
+html += `</tbody></table>`;
+container.innerHTML = html;
 }
         
         // NUEVA FUNCIÓN: Actualizar tabla de ranking de variación
@@ -560,6 +590,50 @@
 
         function removeFromCart(index) { cart.splice(index, 1); updateUI(); guardarCarrito(); }
 
+        // 1. AGREGAR DESDE MODAL (doble click)
+        function agregarDesdeModal(item) {
+            addToCart(item);
+            mostrarNotificacion(`✅ Producto agregado: "${item.name}"`);
+        }
+
+        // 2. INICIAR TAP (móvil - touchstart)
+        let tapTimer;
+        function iniciarTap(elemento, item) {
+            tapTimer = setTimeout(() => {
+                // TAP LARGO (mantener > 500ms)
+                elemento.classList.add('bg-green-100');
+                agregarDesdeModal(item);
+            }, 500); // 500ms = medio segundo
+        }
+
+        // 3. TERMINAR TAP (móvil - touchend)
+        function terminarTap(elemento) {
+            clearTimeout(tapTimer);
+            elemento.classList.remove('bg-green-100');
+        }
+
+        // 4. MOSTRAR NOTIFICACIÓN
+        function mostrarNotificacion(mensaje) {
+            // Crear notificación
+            const notif = document.createElement('div');
+            notif.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg z-[1000] animate-fade-in';
+            notif.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span class="font-medium">${mensaje}</span>
+                </div>
+            `;
+    
+            document.body.appendChild(notif);
+    
+            // Quitar después de 3 segundos
+            setTimeout(() => {
+                notif.style.opacity = '0';
+                notif.style.transition = 'opacity 0.5s';
+                setTimeout(() => notif.remove(), 500);
+            }, 3000);
+        }
+        
         function guardarCarrito() {
             // Crear objeto con todos los datos del carrito
             const datos = {
@@ -624,6 +698,7 @@
     </script>
 </body>
 </html>
+
 
 
 
