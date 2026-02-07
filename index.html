@@ -214,9 +214,11 @@
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 procesarCSV(csvText);
+                cargarCarritoGuardado();
                 searchInput.disabled = false;
             } catch (e) {
                 console.error("Error cargando CSV");
+                cargarCarritoGuardado();
             }
         });
 
@@ -570,6 +572,27 @@
             localStorage.setItem('midagriCart', JSON.stringify(datos));
         }
 
+        function cargarCarritoGuardado() {
+            // Intentar recuperar datos guardados
+            const guardado = localStorage.getItem('midagriCart');
+    
+            if (guardado) {
+                try {
+                    const datos = JSON.parse(guardado);
+                    cart = datos.cart || [];  // Restaurar carrito
+                    updateUI();  // Actualizar interfaz
+            
+                    console.log("✅ Carrito recuperado. Guardado el:", 
+                               new Date(datos.fechaGuardado).toLocaleString());
+                } catch (e) {
+                    console.error("Error al cargar carrito guardado:", e);
+                    cart = [];  // Si hay error, empezar vacío
+                }
+            } else {
+                console.log("📭 No hay carrito guardado anteriormente");
+            }
+        }
+        
         function shareQuote() {
             if (cart.length === 0) return alert("¡Lista vacía!");
             let text = "*MI LISTA DE AHORRO* 🛒\n";
@@ -601,6 +624,7 @@
     </script>
 </body>
 </html>
+
 
 
 
