@@ -416,7 +416,10 @@
             ...item,
             position: index + 1
         }));
-    
+
+        // GUARDAR DATOS ORIGINALES PARA FILTRADO ← NUEVA
+        window.priceRankingData = rankedProducts;
+            
         // 4. Renderizar tabla única
         renderRankingTable(rankedProducts);
     }
@@ -494,7 +497,10 @@ container.innerHTML = html;
                 ...item,
                 position: index + 1
             }));
-    
+
+            // GUARDAR DATOS ORIGINALES PARA FILTRADO ← NUEVA
+            window.priceRankingData = rankedProducts;
+            
             // 4. Renderizar tabla única de variación
             renderVarRankingTable(rankedProducts);
     }
@@ -642,6 +648,103 @@ container.innerHTML = html;
                 setTimeout(() => notif.remove(), 500);
             }, 3000);
         }
+
+        // FILTRAR TABLA DE PRECIOS
+        function filtrarTablaPrecios() {
+            const searchTerm = document.getElementById('priceSearchInput').value.toLowerCase();
+            const container = document.getElementById('priceRankingTable');
+            const rows = container.querySelectorAll('tr'); // Todas las filas de la tabla
+    
+            let visibleCount = 0;
+    
+            rows.forEach((row, index) => {
+                // Saltar la primera fila (thead)
+                if (index === 0) return;
+        
+                const productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const market = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+        
+                // Buscar en nombre O mercado
+                if (productName.includes(searchTerm) || market.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+            
+                    // Actualizar número de posición
+                    const posCell = row.querySelector('td:first-child');
+                    if (posCell) posCell.textContent = visibleCount;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+    
+                // Mostrar mensaje si no hay resultados
+                const tbody = container.querySelector('tbody');
+                let messageRow = tbody.querySelector('.no-results-message');
+    
+                if (visibleCount === 0 && searchTerm !== '') {
+                    if (!messageRow) {
+                        messageRow = document.createElement('tr');
+                        messageRow.className = 'no-results-message';
+                        messageRow.innerHTML = `
+                            <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                                No se encontraron productos con "${searchTerm}"
+                            </td>`;
+                        tbody.appendChild(messageRow);
+                    }
+                    messageRow.style.display = '';
+                } else if (messageRow) {
+                    messageRow.style.display = 'none';
+                }
+            }
+
+        // FILTRAR TABLA DE VARIACIÓN
+        function filtrarTablaVariacion() {
+            const searchTerm = document.getElementById('varSearchInput').value.toLowerCase();
+            const container = document.getElementById('varRankingTable');
+            const rows = container.querySelectorAll('tr'); // Todas las filas de la tabla
+    
+            let visibleCount = 0;
+    
+            rows.forEach((row, index) => {
+                // Saltar la primera fila (thead)
+                if (index === 0) return;
+        
+            const productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const market = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+        
+            // Buscar en nombre O mercado
+            if (productName.includes(searchTerm) || market.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+            
+                // Actualizar número de posición
+                const posCell = row.querySelector('td:first-child');
+                if (posCell) posCell.textContent = visibleCount;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    
+        // Mostrar mensaje si no hay resultados
+        const tbody = container.querySelector('tbody');
+        let messageRow = tbody.querySelector('.no-results-message');
+    
+        if (visibleCount === 0 && searchTerm !== '') {
+            if (!messageRow) {
+                messageRow = document.createElement('tr');
+                messageRow.className = 'no-results-message';
+                messageRow.innerHTML = `
+                    <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                        No se encontraron productos con "${searchTerm}"
+                    </td>`;
+                tbody.appendChild(messageRow);
+            }
+            messageRow.style.display = '';
+        } else if (messageRow) {
+            messageRow.style.display = 'none';
+        }
+    }
+
         
         function guardarCarrito() {
             // Crear objeto con todos los datos del carrito
@@ -707,6 +810,7 @@ container.innerHTML = html;
     </script>
 </body>
 </html>
+
 
 
 
