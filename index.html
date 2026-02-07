@@ -303,6 +303,13 @@
         // FUNCIÓN MODIFICADA: Renderizar tabla de ranking (REEMPLAZA LA VIEJA renderTable)
         function renderRankingTable(list) {
             const container = document.getElementById('priceRankingTable');
+            const esMovil = window.innerWidth < 768;
+    
+            if (esMovil) {
+                renderTarjetasMovil(list, container, 'precios');
+            } else {
+                renderTablaDesktop(list, container, 'precios');
+            }
     
             let html = `<table class="w-full text-[11px] table-auto">
                 <thead class="bg-slate-200 text-slate-500 font-black uppercase">
@@ -577,7 +584,7 @@
             }));
 
             // GUARDAR DATOS ORIGINALES PARA FILTRADO ← NUEVA
-            window.priceRankingData = rankedProducts;
+            window.varRankingData = rankedProducts;
             
             // 4. Renderizar tabla única de variación
             renderVarRankingTable(rankedProducts);
@@ -909,6 +916,7 @@
     </script>
 </body>
 </html>
+
 
 
 
