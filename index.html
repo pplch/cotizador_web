@@ -506,12 +506,13 @@
         function addToCart(item) {
             cart.push({...item});
             updateUI();
+            guardarCarrito(); // ← ESTA LÍNEA NUEVA
             searchInput.value = '';
             suggestionsBox.classList.add('hidden');
             searchInput.blur();
         }
 
-        function clearCart() { if(confirm("¿Vaciar lista?")) { cart = []; updateUI(); } }
+        function clearCart() { if(confirm("¿Vaciar lista?")) { cart = []; updateUI(); localStorage.removeItem('midagriCart'); } }
 
         function updateUI() {
             quoteList.innerHTML = '';
@@ -555,7 +556,19 @@
             totalPriceEl.innerText = `S/ ${total.toFixed(2)}`;
         }
 
-        function removeFromCart(index) { cart.splice(index, 1); updateUI(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateUI(); guardarCarrito(); }
+
+        function guardarCarrito() {
+            // Crear objeto con todos los datos del carrito
+            const datos = {
+                cart: cart,  // Lista de productos
+                fechaGuardado: new Date().toISOString(),  // Cuándo se guardó
+                total: cart.reduce((sum, item) => sum + item.priceToday, 0)  // Total actual
+            };
+    
+            // Guardar en localStorage (se mantiene aunque cierre navegador)
+            localStorage.setItem('midagriCart', JSON.stringify(datos));
+        }
 
         function shareQuote() {
             if (cart.length === 0) return alert("¡Lista vacía!");
@@ -588,6 +601,7 @@
     </script>
 </body>
 </html>
+
 
 
 
