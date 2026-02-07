@@ -340,6 +340,121 @@
     html += `</tbody></table>`;
     container.innerHTML = html;
 }
+       
+        // RENDERIZAR TARJETAS PARA MÓVIL
+        function renderTarjetasMovil(list, container, tipo) {
+            let html = '';
+    
+            list.forEach(item => {
+                const isDown = item.varFloat < 0;
+                const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+                const vIcon = isDown ? '🔴' : (item.varFloat > 0 ? '🟢' : '➖');
+                const vSymbol = isDown ? '↓' : (item.varFloat > 0 ? '↑' : '→');
+        
+                html += `
+                <div class="bg-white rounded-xl p-4 mb-3 shadow-sm border border-slate-200 cursor-pointer"
+                     ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+            
+                    <!-- Fila 1: Posición y Nombre -->
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-black text-slate-700 text-sm">#${item.position}</span>
+                        <span class="font-bold text-slate-900 text-sm truncate flex-1 ml-2">${item.name}</span>
+                    </div>
+            
+                    <!-- Fila 2: Datos compactos -->
+                    <div class="text-xs text-slate-700 grid grid-cols-4 gap-1">
+                        <span class="font-semibold">Hoy: <span class="font-bold text-blue-700">S/${item.priceToday.toFixed(2)}</span></span>
+                        <span class="font-semibold">Ayer: <span class="text-slate-600">S/${(item.priceYesterday || 0).toFixed(2)}</span></span>
+                        <span class="font-semibold ${vColor}">${vSymbol} ${item.varStr}</span>
+                        <span class="font-semibold text-slate-500 uppercase">${item.market}</span>
+                    </div>
+                </div>`;
+            });
+    
+            container.innerHTML = html;
+        }
+
+        // RENDERIZAR TABLA PARA DESKTOP
+        function renderTablaDesktop(list, container, tipo) {
+            let html = `<table class="w-full text-[11px] table-auto">
+                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
+                    <tr>
+                        <th class="p-3 text-left w-16">#</th>
+                        <th class="p-3 text-left">Producto</th>
+                        <th class="p-3 text-right w-32">Ayer</th>
+                        <th class="p-3 text-right w-24">Hoy</th>
+                        <th class="p-3 text-right w-28">Var %</th>
+                        <th class="p-3 text-right w-20">Mercado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">`;
+    
+        list.forEach(item => {
+            const isDown = item.varFloat < 0;
+            const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+            const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
+        
+            html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
+                    ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+                <td class="p-3 font-bold text-slate-800 truncate">${item.name}</td>
+                <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+                <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+                <td class="p-3 text-right font-bold ${vColor} price-number">
+                    <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+                </td>
+                <td class="p-3 text-right font-semibold text-slate-500 uppercase">${item.market}</td>
+            </tr>`;
+        });
+    
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+        // TABLA DESKTOP PARA VARIACIÓN (similar a precios pero con columna de mercado integrada)
+        function renderTablaDesktopVariacion(list, container) {
+            let html = `<table class="w-full text-[11px] table-auto">
+                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
+                    <tr>
+                        <th class="p-3 text-left w-16">#</th>
+                        <th class="p-3 text-left">Producto</th>
+                        <th class="p-3 text-right w-32">Hoy</th>
+                        <th class="p-3 text-right w-24">Ayer</th>
+                        <th class="p-3 text-right w-28">Var %</th>
+                        <th class="p-3 text-right w-20">Mercado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">`;
+    
+            list.forEach(item => {
+                const isDown = item.varFloat < 0;
+                const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
+                const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
+        
+                // Color especial para variaciones extremas (opcional, lo mantienes si quieres)
+                let varCellClass = `p-3 text-right font-bold ${vColor} price-number`;
+                if (Math.abs(item.varFloat) > 20) {
+                    varCellClass += ' text-lg';
+                }
+        
+                html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
+                            ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
+                    <td class="p-3 font-bold text-slate-800 truncate">${item.name}</td>
+                    <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
+                    <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
+                    <td class="${varCellClass}">
+                        <i class="fas ${vIcon} mr-1"></i>${item.varStr}
+                    </td>
+                    <td class="p-3 text-right font-semibold text-slate-500 uppercase">${item.market}</td>
+                </tr>`;
+            });
+    
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+        
+        
         function openPriceModal() {
             document.body.classList.add('modal-open');
             document.getElementById('priceModal').style.display = 'flex';
@@ -424,53 +539,16 @@
         renderRankingTable(rankedProducts);
     }
 
-        // NUEVA FUNCIÓN: Renderizar tabla de ranking de variación
         function renderVarRankingTable(list) {
             const container = document.getElementById('varRankingTable');
+            const esMovil = window.innerWidth < 768; // Misma detección
     
-            let html = `<table class="w-full text-[11px] table-auto">
-                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
-                    <tr>
-                        <th class="p-3 text-left w-16">#</th>
-                        <th class="p-3 text-left">Producto</th>
-                        <th class="p-3 text-right w-32">Precio Hoy</th>
-                        <th class="p-3 text-right w-24">Precio Ayer</th>
-                        <th class="p-3 text-right w-28">Var %</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">`;
-    
-        list.forEach(item => {
-            const isDown = item.varFloat < 0;
-            const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
-            const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-
-            // Color especial para variaciones extremas
-            let varCellClass = `p-3 text-right font-bold ${vColor} price-number`;
-            if (Math.abs(item.varFloat) > 20) { // Variación > 20%
-                varCellClass += ' text-lg';
+            if (esMovil) {
+                renderTarjetasMovil(list, container, 'variacion');
+            } else {
+                renderTablaDesktopVariacion(list, container);
             }
-
-            html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
-                    ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                    
-            <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
-            <td class="p-3 font-bold text-slate-800 truncate">
-                ${item.name}
-                <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
-            </td>
-            <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
-            <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
-            <td class="${varCellClass}">
-                <i class="fas ${vIcon} mr-1"></i>${item.varStr}
-            </td>
-    </tr>`;
-});
-
-// ESTAS 2 LÍNEAS LAS DEJAS IGUAL, NO LAS CAMBIES
-html += `</tbody></table>`;
-container.innerHTML = html;
-}
+        }
         
         // NUEVA FUNCIÓN: Actualizar tabla de ranking de variación
         function updateVarRanking(order) {
@@ -651,12 +729,17 @@ container.innerHTML = html;
 
         // FILTRAR TABLA DE PRECIOS (VERSIÓN MEJORADA)
         function filtrarTablaPrecios() {
+            const esMovil = window.innerWidth < 768;
             const searchTerm = document.getElementById('priceSearchInput').value.toLowerCase().trim();
     
             // Si no hay datos guardados o búsqueda vacía, mostrar todo
             if (!window.priceRankingData || searchTerm === '') {
                 if (window.priceRankingData) {
-                    renderRankingTable(window.priceRankingData);
+                    if (esMovil) {
+                        renderTarjetasMovil(window.priceRankingData, document.getElementById('priceRankingTable'), 'precios');
+                    } else {
+                        renderTablaDesktop(window.priceRankingData, document.getElementById('priceRankingTable'), 'precios');
+                    }
                 }
                 return;
             }
@@ -676,6 +759,13 @@ container.innerHTML = html;
     
             // Renderizar tabla filtrada
             renderRankingTable(rankedFiltered);
+
+            // LLAMAR FUNCIÓN CORRECTA SEGÚN DISPOSITIVO
+            if (esMovil) {
+                renderTarjetasMovil(rankedFiltered, document.getElementById('priceRankingTable'), 'precios');
+            } else {
+                renderTablaDesktop(rankedFiltered, document.getElementById('priceRankingTable'), 'precios');
+            }
     
             // Mostrar mensaje si no hay resultados
             const container = document.getElementById('priceRankingTable');
@@ -701,12 +791,17 @@ container.innerHTML = html;
         
         // FILTRAR TABLA DE VARIACIÓN (VERSIÓN MEJORADA)
         function filtrarTablaVariacion() {
+            const esMovil = window.innerWidth < 768;
             const searchTerm = document.getElementById('varSearchInput').value.toLowerCase().trim();
     
-            // Si no hay datos guardados o búsqueda vacía, mostrar todo
             if (!window.varRankingData || searchTerm === '') {
                 if (window.varRankingData) {
-                    renderVarRankingTable(window.varRankingData);
+                    // Usar la función correcta según dispositivo
+                    if (esMovil) {
+                        renderTarjetasMovil(window.varRankingData, document.getElementById('varRankingTable'), 'variacion');
+                    } else {
+                        renderTablaDesktopVariacion(window.varRankingData, document.getElementById('varRankingTable'));
+                    }
                 }
                 return;
             }
@@ -724,29 +819,31 @@ container.innerHTML = html;
                 position: index + 1
             }));
     
-            // Renderizar tabla filtrada
-            renderVarRankingTable(rankedFiltered);
+            // Renderizar tabla/tarjeta filtrada según dispositivo
+            if (esMovil) {
+                renderTarjetasMovil(rankedFiltered, document.getElementById('varRankingTable'), 'variacion');
+            } else {
+                renderTablaDesktopVariacion(rankedFiltered, document.getElementById('varRankingTable'));
+            }
     
-            // Mostrar mensaje si no hay resultados
-            const container = document.getElementById('varRankingTable');
-            const tbody = container.querySelector('tbody');
-            let messageRow = tbody.querySelector('.no-results-message');
-    
-            if (filtered.length === 0) {
+            // Mostrar mensaje si no hay resultados (solo en desktop, en móvil ya está en tarjetas)
+            if (!esMovil && filtered.length === 0 && searchTerm !== '') {
+                const container = document.getElementById('varRankingTable');
+                const tbody = container.querySelector('tbody');
+                let messageRow = tbody.querySelector('.no-results-message');
+        
                 if (!messageRow) {
                     messageRow = document.createElement('tr');
                     messageRow.className = 'no-results-message';
                     messageRow.innerHTML = `
-                        <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                        <td colspan="6" class="p-8 text-center text-slate-400 italic">
                             No se encontraron productos con "${searchTerm}"
                         </td>`;
                     tbody.appendChild(messageRow);
-                }
-                messageRow.style.display = '';
-            } else if (messageRow) {
-                messageRow.style.display = 'none';
             }
+            messageRow.style.display = '';
         }
+    }
         
         function guardarCarrito() {
             // Crear objeto con todos los datos del carrito
@@ -812,6 +909,7 @@ container.innerHTML = html;
     </script>
 </body>
 </html>
+
 
 
 
