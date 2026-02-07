@@ -310,39 +310,8 @@
             } else {
                 renderTablaDesktop(list, container, 'precios');
             }
-    
-            let html = `<table class="w-full text-[11px] table-auto">
-                <thead class="bg-slate-200 text-slate-500 font-black uppercase">
-                    <tr>
-                        <th class="p-3 text-left w-16">#</th>
-                        <th class="p-3 text-left">Producto</th>
-                        <th class="p-3 text-right w-32">Ayer</th>
-                        <th class="p-3 text-right w-24">Hoy</th>
-                        <th class="p-3 text-right w-28">Var %</th>
-                    </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">`;
-    
-   list.forEach(item => {
-    const isDown = item.varFloat < 0;
-    const vColor = isDown ? 'text-emerald-600' : (item.varFloat > 0 ? 'text-red-600' : 'text-slate-500');
-    const vIcon = isDown ? 'fa-arrow-down' : (item.varFloat === 0 ? 'fa-minus' : 'fa-arrow-up');
-    
-    html += `<tr class="bg-white hover:bg-slate-50 cursor-pointer"
-                ondblclick="agregarDesdeModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                
-        <td class="p-3 text-center font-black text-slate-400">${item.position}</td>
-        <td class="p-3 font-bold text-slate-800 truncate">
-            ${item.name}
-            <div class="text-[10px] text-slate-500 font-semibold uppercase tracking-tighter mt-0.5">${item.market}</div>
-        </td>
-        <td class="p-3 text-right price-number text-slate-500 font-medium">S/${(item.priceYesterday || 0).toFixed(2)}</td>
-        <td class="p-3 text-right font-bold text-blue-800 price-number">S/${item.priceToday.toFixed(2)}</td>
-        <td class="p-3 text-right font-bold ${vColor} price-number">
-            <i class="fas ${vIcon} mr-1"></i>${item.varStr}
-        </td>
-    </tr>`;
-});
+        }
+         
     
     html += `</tbody></table>`;
     container.innerHTML = html;
@@ -916,6 +885,7 @@
     </script>
 </body>
 </html>
+
 
 
 
